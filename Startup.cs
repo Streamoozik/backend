@@ -29,6 +29,7 @@ namespace backend
                 x.ValueLengthLimit = int.MaxValue;
                 x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
             });
+            services.Configure<AppConfiguration>(Configuration.GetSection("AppConfiguration"));
             services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
         }
 

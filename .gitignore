@@ -1,0 +1,5 @@
+.vscode/
+bin/
+files/*
+internal-nlog.txt
+obj/

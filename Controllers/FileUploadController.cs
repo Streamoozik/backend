@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
 namespace backend.Controllers
@@ -20,10 +21,12 @@ namespace backend.Controllers
     {
         private static readonly FormOptions _defaultFormOptions = new FormOptions();
         private readonly ILogger<FileUploadController> _logger;
+        private readonly AppConfiguration _configuration;
 
-        public FileUploadController(ILogger<FileUploadController> logger)
+        public FileUploadController(ILogger<FileUploadController> logger, IOptions<AppConfiguration> configuration)
         {
             _logger = logger;
+            _configuration = configuration.Value;
         }
         
         [HttpPost]
@@ -40,13 +43,11 @@ namespace backend.Controllers
             // request.
             var formAccumulator = new KeyValueAccumulator();
             string targetFilePath = null;
-            _logger.LogWarning($"boundary length: {_defaultFormOptions.MultipartBoundaryLengthLimit}");
 
             var boundary = MultipartRequestHelper.GetBoundary(
                 MediaTypeHeaderValue.Parse(Request.ContentType),
                 _defaultFormOptions.MultipartBoundaryLengthLimit);
                 
-            _logger.LogWarning($"boundary: {boundary} - {Request.ContentType}");
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
             var section = await reader.ReadNextSectionAsync();
@@ -59,7 +60,7 @@ namespace backend.Controllers
                 {
                     if (MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                     {
-                        targetFilePath = Path.GetTempFileName();
+                        targetFilePath = _configuration.MusicFilePath + contentDisposition.FileName.Substring(1, contentDisposition.FileName.Length - 2);
                         using (var targetStream = System.IO.File.Create(targetFilePath))
                         {
                             await section.Body.CopyToAsync(targetStream);
