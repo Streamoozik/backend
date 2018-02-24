@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using backend.Filters;
 using backend.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ using Microsoft.Net.Http.Headers;
 namespace backend.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class FileUploadController : Controller
     {
         private static readonly FormOptions _defaultFormOptions = new FormOptions();
